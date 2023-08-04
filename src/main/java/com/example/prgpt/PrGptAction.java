@@ -26,7 +26,8 @@ public class PrGptAction extends AnAction {
         try {
             Map<String, Map<Integer, List<String>>> allChanges = getListOfChangedCodePara(changes, project);
             Map<String, Map<Integer, List<String>>> mergedChanges = mergeOverlappingChanges(allChanges);
-
+            printMergedChanges(allChanges,"allchanges");
+            printMergedChanges(mergedChanges,"mergedChanges");
             int k = 0;
         } catch (VcsException ex) {
             throw new RuntimeException(ex);
@@ -133,9 +134,11 @@ public class PrGptAction extends AnAction {
                 List<String> paragraph = change.getValue();
                 int endLine = startLine + paragraph.size() - 1;
 
-                // Check if this change overlaps with the previous one
                 if (lastEndLine != null && startLine <= lastEndLine + 1) {
-                    currentParagraph.addAll(paragraph.subList(lineToIncludeAboveChange, paragraph.size()));
+                    int overlap = (lastEndLine + 1) - startLine;
+                    int startIndex = overlap > 0 ? overlap : 0;
+
+                    currentParagraph.addAll(paragraph.subList(startIndex, paragraph.size()));
                     lastEndLine = endLine;
                 } else {
                     if (currentParagraph != null) {
@@ -146,6 +149,7 @@ public class PrGptAction extends AnAction {
                 }
             }
 
+            // Add the last collected paragraph, if any
             if (currentParagraph != null) {
                 mergedLineChanges.put(lastEndLine - currentParagraph.size() + 1, currentParagraph);
             }
@@ -154,6 +158,29 @@ public class PrGptAction extends AnAction {
         }
 
         return mergedChanges;
+    }
+
+
+
+
+
+    private void printMergedChanges(Map<String, Map<Integer, List<String>>> mergedChanges, String whatAreWePrinting) {
+        System.out.println(whatAreWePrinting);
+        for (Map.Entry<String, Map<Integer, List<String>>> fileEntry : mergedChanges.entrySet()) {
+            String fileName = fileEntry.getKey();
+            System.out.println("File Name: " + fileName);
+
+            Map<Integer, List<String>> lineChanges = fileEntry.getValue();
+            for (Map.Entry<Integer, List<String>> lineEntry : lineChanges.entrySet()) {
+                Integer lineNo = lineEntry.getKey();
+                List<String> changes = lineEntry.getValue();
+                System.out.println("  Line No: " + lineNo);
+
+                for (String change : changes) {
+                    System.out.println("    Change: " + change);
+                }
+            }
+        }
     }
 
 }
