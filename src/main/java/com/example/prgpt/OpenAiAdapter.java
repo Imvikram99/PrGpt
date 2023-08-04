@@ -4,11 +4,13 @@ import com.example.prgpt.model.Message;
 import com.example.prgpt.model.OpenAIConversationDto;
 import com.example.prgpt.model.OpenAIConversationResDto;
 import com.google.gson.Gson;
+import com.intellij.openapi.project.Project;
 import okhttp3.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -19,7 +21,7 @@ public class OpenAiAdapter {
     private static final String MODEL_LATEST = "gpt-4";
     private static final String USER_ROLE = "user";
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
-    private static  String API_KEY = "";
+    private static  String API_KEY = "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";
 
     private static String INVALID_API_KEY_MSG = "invalid api key";
 
@@ -31,8 +33,9 @@ public class OpenAiAdapter {
             .build();
     private static final Gson gson = new Gson();
 
-    public static String generate(String prompt) {
-        API_KEY = APIService.getInstance(null).getApiKey();
+    public static String generate(String prompt,Project project) {
+        API_KEY = APIService.getInstance(project).getApiKey();
+        API_KEY = "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";
             if(API_KEY==null || API_KEY.isEmpty()) {
                 return "couldn't found api key, please provide api key in the pop up, you can generate from your open ai account";
             }
@@ -88,5 +91,12 @@ public class OpenAiAdapter {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    public static String generate(Map<String, Map<Integer, List<String>>> mergedChanges, Project project) {
+        String payload = gson.toJson(mergedChanges);
+        String extendedPayload = "here are my local changes please suggest if i can write these in a better way payload is of format Map<String, Map<Integer, List<String>>> where first key represent file name and then another map's integer key represents line no in that file and value represent my changes, in my java code. payload is delimit by bakcticks `"+payload+"`";
+        String result = generate(extendedPayload,project);
+        return result;
     }
 }
