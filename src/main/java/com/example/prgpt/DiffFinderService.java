@@ -157,10 +157,32 @@ public class DiffFinderService {
     }
 
     public Map<String, Map<Integer, List<String>>> findChangesInFiles(List<Change> changes, Project project) throws VcsException {
-        Map<String, Map<Integer, List<String>>> allChanges = getListOfChangedCodePara(changes, project);
-        Map<String, Map<Integer, List<String>>> mergedChanges = mergeOverlappingChanges(allChanges);
-        printMergedChanges(allChanges,"allchanges");
-        printMergedChanges(mergedChanges,"mergedChanges");
+        Map<String, Map<Integer, List<String>>> lineByLineChanges = getListOfChangedCodePara(changes, project);
+        Map<String, Map<Integer, List<String>>> paraChanges = mergeOverlappingChanges(lineByLineChanges);
+        //we need to pass parachanges as well as entire functions so that chat gpt can get the context
+        //printMergedChanges(lineByLineChanges,"allchanges");
+        //printMergedChanges(paraChanges,"mergedChanges");
+        return paraChanges;
+    }
+    public  Map<String, Map<Integer, String>> getFormatedChanges(Map<String, Map<Integer, List<String>>> changes) {
+        Map<String, Map<Integer, String>> mergedChanges = new HashMap<>();
+
+        for (Map.Entry<String, Map<Integer, List<String>>> fileEntry : changes.entrySet()) {
+            String fileName = fileEntry.getKey();
+            Map<Integer, List<String>> lineChangesMap = fileEntry.getValue();
+            Map<Integer, String> mergedLineChangesMap = new HashMap<>();
+
+            for (Map.Entry<Integer, List<String>> lineEntry : lineChangesMap.entrySet()) {
+                int lineNumber = lineEntry.getKey();
+                List<String> changesList = lineEntry.getValue();
+                String mergedChangesForLine = String.join(" ", changesList);
+
+                mergedLineChangesMap.put(lineNumber, mergedChangesForLine);
+            }
+
+            mergedChanges.put(fileName, mergedLineChangesMap);
+        }
+
         return mergedChanges;
     }
 

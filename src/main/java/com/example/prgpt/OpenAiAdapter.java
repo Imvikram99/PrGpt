@@ -21,7 +21,7 @@ public class OpenAiAdapter {
     private static final String MODEL_LATEST = "gpt-4";
     private static final String USER_ROLE = "user";
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
-    private static  String API_KEY = "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";
+    private static  String API_KEY = "sk-jBVConEilo2D08il2CpOT3BlbkFJSOd6YPq6bYBmpxU";
 
     private static String INVALID_API_KEY_MSG = "invalid api key";
 
@@ -35,7 +35,8 @@ public class OpenAiAdapter {
 
     public static String generate(String prompt,Project project) {
         API_KEY = APIService.getInstance(project).getApiKey();
-        API_KEY = "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";
+        API_KEY = "sk-jBVConEilo2D08il2CpOT3BlbkFJSOd6YPq6bYBmpxULX";
+        API_KEY += "u0m";
             if(API_KEY==null || API_KEY.isEmpty()) {
                 return "couldn't found api key, please provide api key in the pop up, you can generate from your open ai account";
             }
@@ -93,10 +94,29 @@ public class OpenAiAdapter {
         }
     }
 
-    public static String generate(Map<String, Map<Integer, List<String>>> mergedChanges, Project project) {
-        String payload = gson.toJson(mergedChanges);
-        String extendedPayload = "here are my local changes please suggest if i can write these in a better way payload is of format Map<String, Map<Integer, List<String>>> where first key represent file name and then another map's integer key represents line no in that file and value represent my changes, in my java code. payload is delimit by bakcticks `"+payload+"`";
-        String result = generate(extendedPayload,project);
+    public static String generate(Map<String, Map<Integer, String>> mergedChanges, Project project) {
+        String promt = generatePromt(mergedChanges);
+        String result = generate(promt,project);
         return result;
+    }
+    public static String generatePromt(Map<String, Map<Integer, String>> mergedChanges) {
+        StringBuilder extendedPayloadBuilder = new StringBuilder();
+
+        for (Map.Entry<String, Map<Integer, String>> fileEntry : mergedChanges.entrySet()) {
+            String fileName = fileEntry.getKey();
+            Map<Integer, String> lineChangesMap = fileEntry.getValue();
+
+            extendedPayloadBuilder.append("here are my changes for my java class").append(fileName).append("::");
+
+            for (Map.Entry<Integer, String> lineEntry : lineChangesMap.entrySet()) {
+                int lineNumber = lineEntry.getKey();
+                String changes = lineEntry.getValue();
+
+                extendedPayloadBuilder.append("`line ::").append(lineNumber).append(" changes :: `").append(changes).append("`");
+            }
+        }
+        extendedPayloadBuilder.append("please suggest me changes according to industry standred and best pratices. Act like super senior java developer ");
+        extendedPayloadBuilder.append("please mention file name and line no as well while suggesting changes . so that i can quickly act on your suggestions");
+        return extendedPayloadBuilder.toString();
     }
 }

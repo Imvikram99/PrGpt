@@ -1,20 +1,42 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-    <id>com.example.PRGPT</id>
+    <id>ai.apiverse.CodeReview</id>
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>PRGPT</name>
+    <name>PeerReview Plus</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="support@yourcompany.com" url="https://www.yourcompany.com">YourCompany</vendor>
+    <vendor email="vikram.panwar@apiverse.ai" url="https://www.apiverse.ai">Apiverse</vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
+    Revolutionizing Code Quality Assurance for IntelliJ
+
+IntelliReview is not just a code review tool; it's your comprehensive coding companion, designed exclusively for IntelliJ. Developers, quality engineers, and code enthusiasts can now transcend the mundane code reviewing process with IntelliReview's cutting-edge features:
+
+Smart Analysis: Harnessing the power of AI-driven algorithms, IntelliReview scans your code in real-time, identifying patterns, anti-patterns, and potential bottlenecks, offering proactive suggestions.
+
+Collaborative Reviews: Facilitate seamless collaboration with team members, track comments, and streamline your review process with integrated workflow management.
+
+Custom Rules and Standards: Tailor the review process to your organization's specific coding standards. IntelliReview offers customizable rule sets that can be adapted to various coding styles and project requirements.
+
+Performance Profiling: Dig deeper into performance metrics and optimize your code. Our built-in profiler analyzes memory usage, execution time, and other critical parameters.
+
+Security Scanning: Ensure code integrity with robust security checks that detect vulnerabilities and offer solutions to fortify your codebase.
+
+Seamless Integration: As a native IntelliJ plugin, IntelliReview fits effortlessly into your existing workflow. No more context switching - everything you need is right where you code.
+
+In-depth Reporting: Get clear, actionable insights with detailed reports, trend analysis, and graphical representations that help you make informed decisions.
+
+Responsive Support: Our dedicated support team is always on standby to assist you with any queries, ensuring that you get the most out of IntelliReview.
+
+At Peer plus, we believe that code review is not a task but an art. With our plugin, code quality transcends beyond mere compliance, transforming into a craft where excellence is achieved through insight, collaboration, and precision.
+
+Join the growing community of developers who have elevated their code review process with IntelliReview, and discover a new horizon of coding intelligence and quality assurance.<br>
     <em>most HTML tags may be used</em>
   ]]></description>
 
@@ -30,7 +52,7 @@
 
     </extensions>
     <actions>
-        <action id="com.example.prgpt.PrGptAction" class="com.example.prgpt.PrGptAction" text="Review"
+        <action id="com.example.prgpt.PrGptAction" class="com.example.prgpt.PrGptAction" text="PeerReview Plus"
                 description="review PR and code changes">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
             <keyboard-shortcut keymap="$default" first-keystroke="shift meta R" second-keystroke="shift meta R"/>
