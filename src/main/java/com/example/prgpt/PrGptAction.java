@@ -25,7 +25,8 @@ public class PrGptAction extends AnAction {
 
         try {
             Map<String, Map<Integer, List<String>>> allChanges = getListOfChangedCodePara(changes, project);
-            // Additional code...
+            Map<String, Map<Integer, List<String>>> mergedChanges = mergeOverlappingChanges(allChanges);
+
             int k = 0;
         } catch (VcsException ex) {
             throw new RuntimeException(ex);
@@ -66,29 +67,42 @@ public class PrGptAction extends AnAction {
         LinkedList<DiffMatchPatch.Diff> diffs = dmp.diffMain(beforeContent, afterContent);
         LinkedHashMap<Integer, List<String>> changes = new LinkedHashMap<>();
         int currentLineNo = 0;
-        String[] lines = afterContent.split("\n");
+
+        // This variable will keep track of the line number relative to the afterContent string
+        int lineIndex = 0;
 
         for (DiffMatchPatch.Diff diff : diffs) {
+            int linesInDiff = countNewlines(diff.text);
+
             if (diff.operation == DiffMatchPatch.Operation.INSERT) {
-                int lineEnd = currentLineNo;
-                int prevLineStart = lineEnd - lineToIncludeAboveChange;
+                int prevLineStart = lineIndex - lineToIncludeAboveChange;
                 if (prevLineStart < 0) prevLineStart = 0;
-                int changeStartLineNo = lineEnd - lineToIncludeAboveChange;
-                if (changeStartLineNo < 0) changeStartLineNo = 0;
-                int nextLineEnd = lineEnd + lineToIncludeBelowChange;
+
+                int nextLineEnd = lineIndex + linesInDiff + lineToIncludeBelowChange - 1;
+
                 List<String> paragraph = new ArrayList<>();
+                String[] lines = afterContent.split("\n");
                 for (int i = prevLineStart; i <= nextLineEnd && i < lines.length; i++) {
                     paragraph.add(lines[i]);
                 }
-                changes.put(changeStartLineNo, paragraph);
-                currentLineNo += countNewlines(diff.text);
-            } else if (diff.operation == DiffMatchPatch.Operation.EQUAL) {
-                currentLineNo += countNewlines(diff.text);
+                changes.put(prevLineStart, paragraph);
+            }
+
+            // Only update the line index if the operation is EQUAL or INSERT
+            if (diff.operation != DiffMatchPatch.Operation.DELETE) {
+                lineIndex += linesInDiff;
+            }
+
+            // If the operation is EQUAL or DELETE, we need to update the current line number relative to beforeContent
+            if (diff.operation != DiffMatchPatch.Operation.INSERT) {
+                currentLineNo += linesInDiff;
             }
         }
 
         return changes;
     }
+
+
 
     private int countNewlines(String text) {
         int count = 0;
@@ -99,4 +113,47 @@ public class PrGptAction extends AnAction {
         }
         return count;
     }
+
+    private Map<String, Map<Integer, List<String>>> mergeOverlappingChanges(Map<String, Map<Integer, List<String>>> allChanges) {
+        Map<String, Map<Integer, List<String>>> mergedChanges = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Map<Integer, List<String>>> fileChanges : allChanges.entrySet()) {
+            String fileName = fileChanges.getKey();
+            Map<Integer, List<String>> lineChanges = fileChanges.getValue();
+
+            // Sort the changes by line number
+            TreeMap<Integer, List<String>> sortedLineChanges = new TreeMap<>(lineChanges);
+
+            Map<Integer, List<String>> mergedLineChanges = new LinkedHashMap<>();
+            Integer lastEndLine = null;
+            List<String> currentParagraph = null;
+
+            for (Map.Entry<Integer, List<String>> change : sortedLineChanges.entrySet()) {
+                Integer startLine = change.getKey();
+                List<String> paragraph = change.getValue();
+                int endLine = startLine + paragraph.size() - 1;
+
+                // Check if this change overlaps with the previous one
+                if (lastEndLine != null && startLine <= lastEndLine + 1) {
+                    currentParagraph.addAll(paragraph.subList(lineToIncludeAboveChange, paragraph.size()));
+                    lastEndLine = endLine;
+                } else {
+                    if (currentParagraph != null) {
+                        mergedLineChanges.put(lastEndLine - currentParagraph.size() + 1, currentParagraph);
+                    }
+                    currentParagraph = new ArrayList<>(paragraph);
+                    lastEndLine = endLine;
+                }
+            }
+
+            if (currentParagraph != null) {
+                mergedLineChanges.put(lastEndLine - currentParagraph.size() + 1, currentParagraph);
+            }
+
+            mergedChanges.put(fileName, mergedLineChanges);
+        }
+
+        return mergedChanges;
+    }
+
 }
