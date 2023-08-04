@@ -16,7 +16,7 @@ import java.util.*;
 
 public class PrGptAction extends AnAction {
     public PrGptAction() {
-        super("PRGPT", "PRGPT can be used to get feedback on your code gpt 4", IconClass.CUSTOM_ICON);
+        super("PeerReviewPlus", "PeerReviewPlus can be used to get feedback on your code gpt 4", IconClass.CUSTOM_ICON);
     }
     @Override
     public void actionPerformed(AnActionEvent e) {

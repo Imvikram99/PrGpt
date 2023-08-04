@@ -1,11 +1,11 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-    <id>ai.apiverse.CodeReview</id>
+    <id>ai.apiverse.PeerReviewPlus</id>
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>PeerReview Plus</name>
+    <name>PeerReviewPlus</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
     <vendor email="vikram.panwar@apiverse.ai" url="https://www.apiverse.ai">Apiverse</vendor>
@@ -52,7 +52,7 @@ Join the growing community of developers who have elevated their code review pro
 
     </extensions>
     <actions>
-        <action id="com.example.prgpt.PrGptAction" class="com.example.prgpt.PrGptAction" text="PeerReview Plus"
+        <action id="com.example.prgpt.PrGptAction" class="com.example.prgpt.PrGptAction" text="Peer Review Plus"
                 description="review PR and code changes">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
             <keyboard-shortcut keymap="$default" first-keystroke="shift meta R" second-keystroke="shift meta R"/>
