@@ -1,1 +1,1 @@
-rootProject.name = "PeerReviewPlus"
+rootProject.name = "PRGPT"

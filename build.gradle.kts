@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "ai.apiverse"
-version = "1.0-STABLE"
+version = "1.2-STABLE"
 
 repositories {
     mavenCentral()
